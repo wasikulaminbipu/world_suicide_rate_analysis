@@ -9,7 +9,7 @@
 <meta name="author" content="Wasikul Amin Bipu">
 <meta name="dcterms.date" content="2023-11-15">
 
-<title>World Suicide Rate Analysis</title>
+<title>World Suicide Rate Analysis (1985-2016)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -91,7 +91,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">World Suicide Rate Analysis</h1>
+<h1 class="title">World Suicide Rate Analysis (1985-2016)</h1>
 </div>
 
 
@@ -124,6 +124,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="data-importing" class="level3">
 <h3 class="anchored" data-anchor-id="data-importing">Data Importing</h3>
 <div class="cell" data-hash="analysis_cache/html/unnamed-chunk-1_09636b1d21157021971546b85e893aad">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Importing tidyverse</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tidyverse"</span>)</span>
@@ -134,6 +136,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if the data has imported correctly with glimpse() function</span></span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(db)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 27,820
 Columns: 12
@@ -157,23 +160,32 @@ $ generation           &lt;chr&gt; "Generation X", "Silent", "Generation X", "G.
 <h3 class="anchored" data-anchor-id="fixing-variable-types">Fixing Variable Types</h3>
 <p>In tidyverse, when we read external database it assumes most of the data as character type. We will make that factor to analyze them correctly.</p>
 <div class="cell" data-hash="analysis_cache/html/unnamed-chunk-2_1be8bd629b9a3b9a6d10a96b00d1d6fb">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Converting variables to factor</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>db <span class="ot">&lt;-</span> db <span class="sc">%&gt;%</span> <span class="fu">mutate_at</span>(<span class="fu">vars</span>(<span class="st">"country"</span>, <span class="st">"year"</span>,<span class="st">"sex"</span>, <span class="st">"age"</span>,<span class="st">"generation"</span>,<span class="st">"country-year"</span>), as.factor)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 </section>
 <section id="renaming-column" class="level3">
 <h3 class="anchored" data-anchor-id="renaming-column">Renaming Column</h3>
 <p>Different column are of different type names. I will prefer all the names in same type. I love to prepare column names so that I don’t have to change it for visualization purpose. So, I will allow spaces. Here I am changing column names.</p>
 <div class="cell" data-hash="analysis_cache/html/unnamed-chunk-3_8eb8e71ff32a1be9d0e3c9a4429cc1fb">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>db <span class="ot">&lt;-</span> db <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="st">"Country"</span><span class="ot">=</span><span class="st">"country"</span>,<span class="st">"Year"</span><span class="ot">=</span><span class="st">"year"</span>,<span class="st">"Sex"</span><span class="ot">=</span><span class="st">"sex"</span>,<span class="st">"Age"</span><span class="ot">=</span><span class="st">"age"</span>,<span class="st">"No of Suicides"</span><span class="ot">=</span><span class="st">"suicides_no"</span>,<span class="st">"Population"</span><span class="ot">=</span><span class="st">"population"</span>,<span class="st">"Suicides (Per 100k Population)"</span><span class="ot">=</span><span class="st">"suicides/100k pop"</span>,<span class="st">"GDP for Year"</span><span class="ot">=</span><span class="st">"gdp_for_year ($)"</span>,<span class="st">"GDP per Capita"</span><span class="ot">=</span><span class="st">"gdp_per_capita ($)"</span>,<span class="st">"Generation"</span><span class="ot">=</span><span class="st">"generation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 </section>
 <section id="removing-unnecessary-columns" class="level3">
 <h3 class="anchored" data-anchor-id="removing-unnecessary-columns">Removing Unnecessary Columns</h3>
 <p>There are few Columns in this database which is really unnecessary. Specially <code>country-year</code> column. This column contains data of both year and country which is already available in separate columns. So, I feel that should be removed. Let’s remove the column</p>
 <div class="cell" data-hash="analysis_cache/html/unnamed-chunk-4_535720fddd0118594583437594be9038">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># removing unnecessary columns</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>db_2 <span class="ot">&lt;-</span> db <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span> <span class="st">`</span><span class="at">country-year</span><span class="st">`</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 <p>Now there are only 11 columns. Almost all the data are tidy now. Now go for the further steps. But before performing further steps it would be soothing for eyes to see what data we have now.</p>
 </section>
@@ -181,11 +193,14 @@ $ generation           &lt;chr&gt; "Generation X", "Silent", "Generation X", "G.
 <h3 class="anchored" data-anchor-id="data-table-to-visualize-the-dataset">Data Table to Visualize the Dataset</h3>
 <p>We will use <code>DT</code> package to visualize the data in a data table.</p>
 <div class="cell" data-hash="analysis_cache/html/unnamed-chunk-5_bb926fc0c6f120868076e0047f78474a">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># importing DT package</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"DT"</span>)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating Data Table</span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">datatable</span>(db)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 
 <div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-24f8ee58da8707763ff0" style="width:100%;height:auto;"></div>
@@ -196,11 +211,14 @@ $ generation           &lt;chr&gt; "Generation X", "Silent", "Generation X", "G.
 <section id="check-na-values" class="level3">
 <h3 class="anchored" data-anchor-id="check-na-values">Check NA Values</h3>
 <div class="cell" data-hash="analysis_cache/html/unnamed-chunk-6_ff9ed3114785244c71d77d23a05240e9">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We will select all the NA value and summarize it</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>na_val <span class="ot">&lt;-</span> db <span class="sc">%&gt;%</span> <span class="fu">select_if</span>(<span class="cf">function</span>(x) <span class="fu">any</span>(<span class="fu">is.na</span>(x))) <span class="sc">%&gt;%</span> <span class="fu">summarise_each</span>(<span class="fu">funs</span>(<span class="fu">sum</span>(<span class="fu">is.na</span>(.))))</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the data in a table</span></span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(na_val, <span class="at">align=</span><span class="st">"l"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
 <thead>
@@ -222,8 +240,11 @@ $ generation           &lt;chr&gt; "Generation X", "Silent", "Generation X", "G.
 <h3 class="anchored" data-anchor-id="univariate-analysis-of-hdi-for-year-variable">Univariate analysis of <code>HDI for year</code> variable</h3>
 <p>We will create histogram for this analysis. I prefer using ggplot2. You can use any visualization library even vanilla R will do.</p>
 <div class="cell" data-layout-align="center" data-hash="analysis_cache/html/fig-hdiyear-hist_b3985db9f2a3008809feecebf09010cc">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generating histogram from HDI for year variable</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>db <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes_string</span>(<span class="st">"`HDI for year`"</span>)) <span class="sc">+</span> <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">100</span>) <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">y=</span><span class="st">"Count"</span>) <span class="sc">+</span> <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <div id="fig-hdiyear-hist" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
@@ -236,11 +257,14 @@ $ generation           &lt;chr&gt; "Generation X", "Silent", "Generation X", "G.
 <p><a href="#fig-hdiyear-hist">Figure&nbsp;1</a> is generated with 100 bins. In this histogram we are clearly seeing that there are some missing values.</p>
 <p>Analysis of data with missing value is bit complicated. So, we will avoid this variable for now. In later part of this document, we will work with this data. To remove the variable we will use <code>select()</code> with (-) value.</p>
 <div class="cell" data-hash="analysis_cache/html/unnamed-chunk-8_4e766e43408956449ac7cc915440d85a">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># removing HDI for year column</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>db_2 <span class="ot">&lt;-</span> db <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span> <span class="st">`</span><span class="at">HDI for year</span><span class="st">`</span>)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># showing the glimpse of the new tibble</span></span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(db_2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 27,820
 Columns: 11
@@ -279,6 +303,8 @@ $ Generation                       &lt;fct&gt; Generation X, Silent, Generation 
 <h3 class="anchored" data-anchor-id="summary-statistics">Summary Statistics</h3>
 <p>We have our plan to summarize the data. We will perform the summary now</p>
 <div class="cell" data-hash="analysis_cache/html/tbl-sum-stat_26b20e74215459492bd4a79339086eec">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensure that the value is in integer not in scientific notation</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">scipen =</span> <span class="dv">999</span>)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -290,6 +316,7 @@ $ Generation                       &lt;fct&gt; Generation X, Silent, Generation 
 <span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the table</span></span>
 <span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(summary_stat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <div id="tbl-sum-stat" class="anchored">
 <table class="table table-sm table-striped small">
@@ -432,9 +459,12 @@ $ Generation                       &lt;fct&gt; Generation X, Silent, Generation 
 <h3 class="anchored" data-anchor-id="frequency-tables">Frequency Tables</h3>
 <p>I created summary statistics for all the continuous data. I have some categorical data also. I have to check them using frequency table. So, without wasting time i will go for frequency tables</p>
 <div class="cell" data-hash="analysis_cache/html/tbl-freq-country_abe7598ceae0d52813adef03dc049602">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>tab_country <span class="ot">&lt;-</span> <span class="fu">table</span>(db_2<span class="sc">$</span>Country)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(tab_country)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <div id="tbl-freq-country" class="anchored">
 <table class="table table-sm table-striped small">
@@ -856,9 +886,12 @@ $ Generation                       &lt;fct&gt; Generation X, Silent, Generation 
 </div>
 </div>
 <div class="cell" data-hash="analysis_cache/html/tbl-freq-year_c3dafd19d3564ee5469d570e5de26a2d">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>tab_year <span class="ot">&lt;-</span> <span class="fu">table</span>(db_2<span class="sc">$</span>Year)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(tab_year)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <div id="tbl-freq-year" class="anchored">
 <table class="table table-sm table-striped small">
@@ -1004,9 +1037,12 @@ $ Generation                       &lt;fct&gt; Generation X, Silent, Generation 
 </div>
 </div>
 <div class="cell" data-hash="analysis_cache/html/tbl-freq-sex_8963f4473e85cbcf1f1196f02ed2cb7e">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>tab_sex <span class="ot">&lt;-</span> <span class="fu">table</span>(db_2<span class="sc">$</span>Sex)</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(tab_sex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <div id="tbl-freq-sex" class="anchored">
 <table class="table table-sm table-striped small">
@@ -1032,9 +1068,12 @@ $ Generation                       &lt;fct&gt; Generation X, Silent, Generation 
 </div>
 </div>
 <div class="cell" data-hash="analysis_cache/html/tbl-freq-age_4a7535da170acdfdb3958f9781242a76">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>tab_age <span class="ot">&lt;-</span> <span class="fu">table</span>(db_2<span class="sc">$</span>Age)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(tab_age)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <div id="tbl-freq-age" class="anchored">
 <table class="table table-sm table-striped small">
@@ -1076,9 +1115,12 @@ $ Generation                       &lt;fct&gt; Generation X, Silent, Generation 
 </div>
 </div>
 <div class="cell" data-hash="analysis_cache/html/tbl-freq-gen_59db8a022c59e4c1dd3bf10bde17cb9f">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>tab_gen <span class="ot">&lt;-</span> <span class="fu">table</span>(db_2<span class="sc">$</span>Generation)</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(tab_gen)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <div id="tbl-freq-gen" class="anchored">
 <table class="table table-sm table-striped small">
@@ -1127,9 +1169,12 @@ $ Generation                       &lt;fct&gt; Generation X, Silent, Generation 
 <li><strong>Country Data Analysis:</strong> For Analysis of country data we will create several plots. I don’t think visualizing all the country data will be appropriate. So, I will take sample of 5 data from the frequency table to visualize.</li>
 </ol>
 <div class="cell" data-hash="analysis_cache/html/fig-bar-country_1a699d8984ef5d351fbfc3253d027ee4">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(tab_country) </span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sample_n</span>(dat,<span class="dv">5</span>) <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(Var1,Freq, <span class="at">fill=</span>Var1)) <span class="sc">+</span> <span class="fu">geom_col</span>() <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Countries"</span>,<span class="at">y=</span><span class="st">"Frequency"</span>) <span class="sc">+</span> <span class="fu">guides</span>(<span class="at">fill=</span><span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <div id="fig-bar-country" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
@@ -1146,9 +1191,12 @@ $ Generation                       &lt;fct&gt; Generation X, Silent, Generation 
 <li><strong><em>Generation:</em></strong> Generation Data have different frequency value. We will create a lollypop plot with this.</li>
 </ol>
 <div class="cell" data-hash="analysis_cache/html/fig-lolly-gen_297cff564d67cd5a2853d08d668f996a">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(tab_gen) </span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>dat <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(Var1,Freq)) <span class="sc">+</span> <span class="fu">geom_point</span>(<span class="at">size=</span><span class="dv">5</span>) <span class="sc">+</span> <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">x=</span>Var1,<span class="at">xend=</span>Var1, <span class="at">y=</span><span class="dv">0</span>,<span class="at">yend=</span>Freq)) <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Generation"</span>,<span class="at">y=</span><span class="st">"Frequency"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <div id="fig-lolly-gen" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">

@@ -1,5 +1,5 @@
 ---
-title: "World Suicide Rate Analysis"
+title: "World Suicide Rate Analysis (1985-2016)"
 author: "Wasikul Amin Bipu"
 date: "15 November 2023"
 execute: 
@@ -8,6 +8,7 @@ execute:
     output: true
     error: false
     warning: false
+code-fold: true
 ---
 
 ## Step by Step World Suicide Rate Analysis with Quarto & R
