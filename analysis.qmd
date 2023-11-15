@@ -1,0 +1,224 @@
+---
+title: "World Suicide Rate Analysis (1985-2016)"
+author: "Wasikul Amin Bipu"
+date: "15 November 2023"
+execute: 
+    cache: true
+    echo: true
+    output: true
+    error: false
+    warning: false
+---
+
+## Step by Step World Suicide Rate Analysis with Quarto & R
+In this document, I will analyze World Suicide Rates step by step. This will make you understand how I have analyzed the data.
+
+### Data Importing
+
+```{r}
+# Importing tidyverse
+
+library("tidyverse")
+library("knitr")
+
+# Reading file
+db <- read_csv("master.csv")
+
+# Check if the data has imported correctly with glimpse() function
+glimpse(db)
+```
+We can see that all the data has been imported correctly. In this database there are 12 columns and 12 rows. We must check if there is any missing(NA) value in this database. Then we can go to further analysis. Lets check for NA…
+
+### Fixing Variable Types
+In tidyverse, when we read external database it assumes most of the data as character type. We will make that factor to analyze them correctly.
+
+```{r}
+# Converting variables to factor
+db <- db %>% mutate_at(vars("country", "year","sex", "age","generation","country-year"), as.factor)
+```
+
+### Renaming Column
+Different column are of different type names. I will prefer all the names in same type. I love to prepare column names so that I don’t have to change it for visualization purpose. So, I will allow spaces. Here I am changing column names.
+
+```{r}
+db <- db %>% rename("Country"="country","Year"="year","Sex"="sex","Age"="age","No of Suicides"="suicides_no","Population"="population","Suicides (Per 100k Population)"="suicides/100k pop","GDP for Year"="gdp_for_year ($)","GDP per Capita"="gdp_per_capita ($)","Generation"="generation")
+```
+
+### Removing Unnecessary Columns
+There are few Columns in this database which is really unnecessary. Specially `country-year` column. This column contains data of both year and country which is already available in separate columns. So, I feel that should be removed. Let’s remove the column
+
+```{r}
+# removing unnecessary columns
+db_2 <- db %>% select(- `country-year`)
+```
+Now there are only 11 columns. Almost all the data are tidy now. Now go for the further steps. But before performing further steps it would be soothing for eyes to see what data we have now.
+
+### Data Table to Visualize the Dataset
+We will use `DT` package to visualize the data in a data table.
+
+```{r}
+# importing DT package
+library("DT")
+
+# Creating Data Table
+datatable(db)
+```
+
+### Check NA Values
+
+```{r}
+# We will select all the NA value and summarize it
+na_val <- db %>% select_if(function(x) any(is.na(x))) %>% summarise_each(funs(sum(is.na(.))))
+
+# Print the data in a table
+kable(na_val, align="l")
+```
+
+We can see that `HDI for year` contains 19456 NA values. This variable is of type integer. So, for further investigation we will perform univariate analysis of the variable.
+
+### Univariate analysis of `HDI for year` variable
+We will create histogram for this analysis. I prefer using ggplot2. You can use any visualization library even vanilla R will do.
+
+```{r}
+#| label: fig-hdiyear-hist
+#| fig-cap: Histogram of HDI for year
+#| fig-align: center
+
+
+# Generating histogram from HDI for year variable
+db %>% ggplot(aes_string("`HDI for year`")) + geom_histogram(bins = 100) + labs(y="Count") + theme_minimal()
+```
+
+@fig-hdiyear-hist is generated with 100 bins. In this histogram we are clearly seeing that there are some missing values.
+
+Analysis of data with missing value is bit complicated. So, we will avoid this variable for now. In later part of this document, we will work with this data. To remove the variable we will use `select()` with (-) value.
+
+```{r}
+# removing HDI for year column
+db_2 <- db %>% select(- `HDI for year`)
+
+# showing the glimpse of the new tibble
+glimpse(db_2)
+```
+Now the database contains only 10 column with no missing values. We will work with this database now.
+
+### Univariate Analysis
+I will perform univariate analysis from now. Before performing univariate analysis I must have a plan for what to do and what not to. My plan is following
+
+1. **Summary Statistics:** I will perform summary statistics for all the continuous variables. Summary statistics will include
+   i. Mean
+   ii. Median
+   iii. Inter-Quartile Range
+   iv. Standard Deviations
+2. **Frequency Table:** for the categorical variables, I will create frequency table to check their conditions.
+3. **Charts:** I will generate some plots to visualize the data. such as histogram, density plots, pie charts etc.
+
+Now, let’s start our univariate analysis journey.
+
+
+### Summary Statistics
+We have our plan to summarize the data. We will perform the summary now
+
+```{r}
+#| label: tbl-sum-stat
+#| tbl-cap: Summary Statistics
+
+
+# Ensure that the value is in integer not in scientific notation
+options(scipen = 999)
+
+# At first select all the variables that are not factor. Then summerise all the data
+summary_stat <- db_2 %>% select_if(~ !is.factor(.)) %>% summarise_all(list(mean=mean,sd=sd,min=min,max=max, IQR=IQR, sum=sum), na.rm=TRUE)
+
+# Make Tibble longer to make it easily understandable
+summary_stat <- pivot_longer(summary_stat, everything())
+
+# Print the table
+kable(summary_stat)
+```
+
+I think we have enough data for summary statistics. all the values are in a table. I love it. Let’s go for the next step.
+
+### Frequency Tables
+I created summary statistics for all the continuous data. I have some categorical data also. I have to check them using frequency table. So, without wasting time i will go for frequency tables
+
+```{r}
+#| label: tbl-freq-country
+#| tbl-cap: Frequency Table of Country
+
+
+tab_country <- table(db_2$Country)
+
+kable(tab_country)
+```
+
+```{r}
+#| label: tbl-freq-year
+#| tbl-cap: Frequency Table of Year
+
+tab_year <- table(db_2$Year)
+
+kable(tab_year)
+```
+
+```{r}
+#| label: tbl-freq-sex
+#| tbl-cap: Frequency Table of Sex
+
+
+tab_sex <- table(db_2$Sex)
+
+kable(tab_sex)
+```
+
+```{r}
+#| label: tbl-freq-age
+#| tbl-cap: Frequency Table of Age
+
+
+tab_age <- table(db_2$Age)
+
+kable(tab_age)
+```
+
+```{r}
+#| label: tbl-freq-gen
+#| tbl-cap: Frequency Table of Generation
+
+
+tab_gen <- table(db_2$Generation)
+
+kable(tab_gen)
+```
+
+### Charts
+In this section of univariate analysis we will visualize all the data in different types of plots. I wish the plots will amaze you. Let’s do it.
+
+1. **Country Data Analysis:** For Analysis of country data we will create several plots. I don’t think visualizing all the country data will be appropriate. So, I will take sample of 5 data from the frequency table to visualize.
+
+```{r}
+#| label: fig-bar-country
+#| fig-cap: Bar Chart of Frequency of Random Countries
+
+
+dat <- as.data.frame(tab_country) 
+
+sample_n(dat,5) %>% ggplot(aes(Var1,Freq, fill=Var1)) + geom_col() + labs(x="Countries",y="Frequency") + guides(fill=FALSE)
+```
+
+2. **Year:** I don’t think this analysis add any values. So, i will avoid this variable.
+3. **Sex:** All the variables here has same frequency. So, we can not visualize the data
+4. **Age:** Here there are also same frequency. So we will avoid this.
+5. ***Generation:*** Generation Data have different frequency value. We will create a lollypop plot with this.
+
+```{r}
+#| label: fig-lolly-gen
+#| fig-cap: Lollypop Plot of Frequency of Generation
+
+dat <- as.data.frame(tab_gen) 
+
+dat %>% ggplot(aes(Var1,Freq)) + geom_point(size=5) + geom_segment(aes(x=Var1,xend=Var1, y=0,yend=Freq)) + labs(x="Generation",y="Frequency")
+```
+
+### References
+1. The Data is downloaded from the following site [Data Frame](https://www.kaggle.com/datasets/russellyates88/suicide-rates-overview-1985-to-2016/data)
