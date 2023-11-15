@@ -1,0 +1,4 @@
+- source: analysis.qmd
+  quarto-pub:
+    - id: ac51c05c-0771-4578-b82c-aefee60d92b8
+      url: 'https://wasikulaminbipu.quarto.pub/world_suicide_rate_analysis'

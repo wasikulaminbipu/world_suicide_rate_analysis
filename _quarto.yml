@@ -1,5 +1,9 @@
 project:
-  title: "World Suicide Rate Analysis"
-
+  title: "world_suicide_rate_analysis"
+  type: default
+  output-dir: _site
+  render: 
+    - analysis.qmd
+  
 
 

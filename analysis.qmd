@@ -1,5 +1,5 @@
 ---
-title: "World Suicide Rate Analysis (1985-2016)"
+title: "World Suicide Rate Analysis"
 author: "Wasikul Amin Bipu"
 date: "15 November 2023"
 execute: 
