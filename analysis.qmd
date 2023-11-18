@@ -21,6 +21,7 @@ In this document, I will analyze World Suicide Rates step by step. This will mak
 
 library("tidyverse")
 library("knitr")
+library("gridExtra")
 
 # Reading file
 db <- read_csv("master.csv")
@@ -29,6 +30,23 @@ db <- read_csv("master.csv")
 glimpse(db)
 ```
 We can see that all the data has been imported correctly. In this database there are 12 columns and 12 rows. We must check if there is any missing(NA) value in this database. Then we can go to further analysis. Lets check for NA…
+
+### Dimentions and Columns 
+I have already imported the data and made it tibble. Now, I should know my data first before going farther. The most basic way to know data is getting its dimention (row and column width) with `dim()` and Knowing column names with `colnames()` function. let's do that practically.
+
+#### Dimention
+```{r}
+dim(db)
+```
+Our tibble has 12 columns and 27820 rows. Now lets learn column names
+
+#### Column Names
+
+```{r}
+col_dt <- colnames(db)
+kable(col_dt, align="l")
+```
+We have got all the column names. Now we know the basics of our data. Lets go for tidying and wrangling.
 
 ### Fixing Variable Types
 In tidyverse, when we read external database it assumes most of the data as character type. We will make that factor to analyze them correctly.
@@ -107,10 +125,10 @@ Now the database contains only 10 column with no missing values. We will work wi
 I will perform univariate analysis from now. Before performing univariate analysis I must have a plan for what to do and what not to. My plan is following
 
 1. **Summary Statistics:** I will perform summary statistics for all the continuous variables. Summary statistics will include
-   i. Mean
-   ii. Median
-   iii. Inter-Quartile Range
-   iv. Standard Deviations
+    i. Mean
+    ii. Median
+    iii. Inter-Quartile Range
+    iv. Standard Deviations
 2. **Frequency Table:** for the categorical variables, I will create frequency table to check their conditions.
 3. **Charts:** I will generate some plots to visualize the data. such as histogram, density plots, pie charts etc.
 
@@ -220,6 +238,136 @@ dat <- as.data.frame(tab_gen)
 
 dat %>% ggplot(aes(Var1,Freq)) + geom_point(size=5) + geom_segment(aes(x=Var1,xend=Var1, y=0,yend=Freq)) + labs(x="Generation",y="Frequency")
 ```
+### For Continuous Variables
+
+### Histogram, Density Plot and Frequency Polygon
+I will create Histogram, Density Plot and Frequency Polygon of several continuous variables for the univariable analysis. These plots will help us understand about the variables. Let's start our analysis.
+
+#### No of Suicides
+
+```{r}
+#| label: fig-no-sui
+#| fig-cap: Histogram, Density plot and Frequency Polygon of No of Suicides
+
+plot_no_sui <- db %>% ggplot(aes(`No of Suicides`))
+
+hist_no_sui <- plot_no_sui + geom_histogram(width=0.5) + labs(title="Histogram of No of Suicides", y="Count")
+
+
+den_no_sui <- plot_no_sui + geom_density() + labs(title="Density plot of No of Suicides",y="Density")
+
+freqpol_no_sui <- plot_no_sui + geom_freqpoly() + labs(title="Frequency Polygon of No of Suicides",y="Count")
+
+grid.arrange(hist_no_sui, den_no_sui, freqpol_no_sui, ncol=2)
+```
+#### Population
+
+
+```{r}
+#| label: fig-pop
+#| fig-cap: Histogram, Density plot and Frequency Polygon of Population
+
+plot_pop <- db %>% ggplot(aes(Population))
+hist_pop <- plot_pop + geom_histogram(width=0.5) + labs(title="Histogram of Population", y="Count")
+
+
+den_pop <- plot_pop + geom_density() + labs(title="Density plot of Population",y="Density")
+
+freqpol_pop <- plot_pop + geom_freqpoly() + labs(title="Frequency Polygon of Population", y="Count")
+
+grid.arrange(hist_pop, den_pop, freqpol_pop, ncol=2)
+```
+
+
+#### Suicides (Per 100k Population) 
+
+```{r}
+#| label: fig-sui
+#| fig-cap: Histogram, Density plot and Frequency Polygon of Suicides (Per 100k Population) 
+
+plot_sui <- db %>% ggplot(aes(`Suicides (Per 100k Population)`))
+
+hist_sui <- plot_sui + geom_histogram(width=0.5) + labs(title="Histogram of Suicides\n(Per 100k Population)", y="Count")
+
+
+den_sui <- plot_sui + geom_density() + labs(title="Density plot of Suicide\n(Per 100k Population)",y="Density")
+
+freqpoly_sui <- plot_sui + geom_freqpoly() + labs(title="Frequency Polygon of Suicide\n(Per 100k Population) ", y="Count")
+
+grid.arrange(hist_sui, den_sui, freqpoly_sui, ncol=2)
+```
+
+#### GDP for Year 
+
+```{r}
+#| label: fig-gdp
+#| fig-cap: Histogram, Density plot and Frequency Polygon of GDP for Year 
+
+plot_gdp <- db %>% ggplot(aes(`GDP for Year`))
+
+hist_gdp <- plot_gdp + geom_histogram(width=0.5) + labs(title="Histogram of GDP for Year", y="Count")
+
+
+den_gdp <- plot_gdp+ geom_density() + labs(title="Density plot of GDP for Year",y="Density")
+
+freqpoly_gdp <- plot_gdp + geom_freqpoly(width=0.5) + labs(title="Frequency Polygon of GDP for Year", y="Count")
+
+grid.arrange(hist_gdp, den_gdp, freqpoly_gdp, ncol=2)
+```
+
+#### GDP per Capita
+
+
+```{r}
+#| label: fig-gdp-capita
+#| fig-cap: Histogram, Density plot and Frequency Polygon of GDP for Year 
+plot_gdp_capita <- db %>% ggplot(aes(`GDP per Capita`))
+
+hist_gdp_capita <- plot_gdp_capita + geom_histogram(width=0.5) + labs(title="Histogram of GDP per Capita", y="Count")
+
+
+den_gdp_capita <- plot_gdp_capita + geom_density() + labs(title="Density plot of GDP per Capita",y="Density")
+
+freqpol_gdp_capita <- plot_gdp_capita + geom_freqpoly() + labs(title="Frequency Polygon of GDP per Capita")
+
+grid.arrange(hist_gdp_capita, den_gdp_capita, freqpol_gdp_capita, ncol=2)
+```
+
+### Box Plot and Violin Plot
+Although we will use multiple variables to create box-whisker plot or Violin Plot. it is considered as univariate analysis. we will create as much boxplot and violin plot as possible for the analysis.
+
+As we have suicide data and most of the value is around zero but there are a higher values too. So boxplot or violin plot is not the best way to visualize it.The plot will look strange for this analysis. So, I will not create many. Though I will create some to ensure that all types of visualization is present in this project.
+
+```{r}
+#| label: fig-box-no-sui
+#| fig-cap: Box Plot and Violin Plot of No of suicides
+
+p1 <- db %>% ggplot(aes(Sex,`Suicides (Per 100k Population)`)) + ylim(-100,300) + geom_boxplot() + labs(title="Box Plot of Suicides (Per 100k population) in different Gender", x="Gender")
+
+p2 <- db %>% ggplot(aes(Sex,`Suicides (Per 100k Population)`, fill=Sex)) + ylim(-100,300) + geom_violin() + labs(title="Violin Plot of Suicides (Per 100k population) in different Gender", x="Gender") + guides(fill=FALSE)
+
+grid.arrange(p1,p2,ncol=1)
+```
+
+
+```{r}
+#| label: fig-box-sui-gen
+#| fig-cap: Box Plot and Violin Plot of No of suicides
+
+p1 <- db %>% ggplot(aes(Generation,`Suicides (Per 100k Population)`)) + ylim(-100,300) + geom_boxplot() + labs(title="Box Plot of Suicides (Per 100k population) in different Generations") 
+
+p2 <- db %>% ggplot(aes(Generation,`Suicides (Per 100k Population)`,fill=Generation)) + ylim(-100,300) + geom_violin() + labs(title="Violine Plot of Suicides (Per 100k population) in different Generations") +guides(fill=FALSE)
+
+grid.arrange(p1,p2,ncol=1)
+```
+
+## Bivariate Analysis
+In this section we will discover relationship between two variables. We will do step by step analysis.
+
+
+
+## Multivariate Analysis
+In this section we will discover relationship among multiple vaiables. For this section, I will do some basic tests and generate some basic plots. Then we will develop some research questions to analyze the data perfectly. Then according to the research questions we will create some plots and perform some tests to find out the answers. I hope you will be with me in the whole journey.
 
 ### References
 1. The Data is downloaded from the following site [Data Frame](https://www.kaggle.com/datasets/russellyates88/suicide-rates-overview-1985-to-2016/data)
